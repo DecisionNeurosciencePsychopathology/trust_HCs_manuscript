@@ -23,7 +23,7 @@ else
     me = strtrim(me);    
     if strcmp(me,'polinavanyukov')==1
         if clinical == 0
-            path_to_trust_ids = '/Users/polinavanyukov/Documents/scripts/Trust/trust_rl_VBA/';
+            path_to_trust_ids = '/Users/polinavanyukov/Scripts/Trust/trust_rl_VBA/';
             if scanner_subjs == 0
                datalocation = glob('/Users/polinavanyukov/Box Sync/Project Trust Game/data/processed/beha_behavior/');
                masterlist = load([path_to_trust_ids 'trust_ids_behav']); %behavioral master list
@@ -32,15 +32,17 @@ else
                masterlist = load([path_to_trust_ids 'trust_ids']);    %scan master list
             end
         else
-            path_to_trust_ids = '/Users/polinavanyukov/Documents/OneDrive/Documents/Project Trust Game/analyses/manuscript clinical/';
+            path_to_trust_ids = '/Users/polinavanyukov/OneDrive/Documents/Project Trust Game/analyses/manuscript clinical/';
             if scanner_subjs == 0
                datalocation = glob('/Users/polinavanyukov/Box Sync/Project Trust Game/data/processed/beha_behavior/');
                masterlist = tdfread([path_to_trust_ids 'trust_beha_masterlist.txt']); %behavioral master list
                masterlist.trust_ids = masterlist.subjectID;
+               save_str = 'clinical_behaviorSEP04/';
             else
                datalocation = glob('/Users/polinavanyukov/Box Sync/Project Trust Game/data/processed/scan_behavior/');
                masterlist = tdfread([path_to_trust_ids 'trust_scan_masterlist.txt']);    %scan master list
                masterlist.trust_ids = masterlist.subjectID;
+               save_str = 'clinical_scanSEP04/';
             end
         end
     else
@@ -63,15 +65,17 @@ end
 %% set parameters
 censor = 0;                     %optional censoring of computer block
 sigma_kappa = 2;                %kappa (or action bias) parameter; kappa = 0: no bias; kappa = 1: single bias parameter; kappa = 2: subject + trustee-specific bias parameters
-counter = 0;                    %counter = 0: no counterfactual feedback; counter = 1: regret; counter = 2: subject/policy; 3: trustee; 4: other type of regret (reviewers); else counter = 5: disappointment (reviewers); counter = 6: SVM model
+counter = 2;                    %counter = 0: no counterfactual feedback; counter = 1: regret; counter = 2: subject/policy; 3: trustee; 4: other type of regret (reviewers); else counter = 5: disappointment (reviewers); counter = 6: SVM model
 multisession = 1;               %0 = modelling all runs as a single block; 1 = modelling runs separately
-fixed = 3;                      % set multisession priors (see description below)
+fixed = 6;                      % set multisession priors (see description below)
 %1: X0 is free; subject-wise kappa only; 
 %2: X0 is fixed; trustee-wise kappa is free; 
 %3: X0 fixed/subject-wise kappa fixed/condition-level kappa is free; 
 %4: X0 is fixed; subject-wise kappa only; learning rate (alpha) is free;
 %5: X0 is fixed; subject-wise kappa only; learning-rate is fixed; beta is
 %free.
+%6: All parameters are fixed to a particular constant value (for generating
+%value and PE regressors with group median parameter values).
 
 
 err_counter = 1;

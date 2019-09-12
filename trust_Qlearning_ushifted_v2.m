@@ -80,6 +80,9 @@ else %sigmakappa == 2
     g_fname = @g_trust_softmax_ks_kt;  % observation function (softmax mapping), evaluates Q(share), w/ subject-wise kappa parameter + trustee-wise kappa parameter (requires multisession)
 end
 
+if fixed == 6
+    g_fname = @g_trust_softmax_ks_kt_fixed_param;
+end
 
 %h_fname = @h_randOutcome; % feedback function (reward schedule)
 % h_fname = @h_Id; % feedback function, reads from u
@@ -161,6 +164,13 @@ blocklength = 48;
 index_vector([1,1+blocklength,1+2*blocklength, 1+3*blocklength],1) = 1;
 u(4,:) = index_vector(1:ntrials);
 
+%all reputations
+trustee_ID = zeros(length(b.identity),1);
+trustee_ID(strcmp(b.identity,'good')) = 1;  
+trustee_ID(strcmp(b.identity,'bad')) = 2; 
+trustee_ID(strcmp(b.identity,'neutral')) = 3; 
+u(8,:) =  trustee_ID(1:ntrials);
+
 if ntrials > 192 %include practice trials
    u = u(:,ntrials - 191:end);
    noresponse = noresponse(ntrials - 191:end);
@@ -177,7 +187,8 @@ if censor == 1
 end
 
 %% shifting U
-u = [zeros(7,1) u(:,1:end-1)];
+%u = [zeros(7,1) u(:,1:end-1)];
+u = [zeros(8,1) u(:,1:end-1)];
 
 %% Sensitivities or bias parameters
 % options.inF.reputation_sensitive = reputation_sensitive;
@@ -250,7 +261,12 @@ if multisession
         options.multisession.fixed.phi = 2; %fixing the beta and kappa parameters to be the same across sessiosn
         options.multisession.fixed.theta = 'all';
         options.multisession.fixed.X0 = 'all';
-        priors.SigmaX0 = diag([0 0]);   %infinite precision priors set on the initial value and PEs        
+        priors.SigmaX0 = diag([0 0]);   %infinite precision priors set on the initial value and PEs  
+    elseif fixed == 6
+        %parameters are all fixed
+        options.multisession.fixed.phi = 'all';
+        options.multisession.fixed.theta = 'all';
+        priors.SigmaX0 = diag([0 0]);
     end        
 end
 options.isYout=zeros(size(u(1,:)));
@@ -310,7 +326,13 @@ else
     priors.SigmaPhi = 10;
 end
 
-
+%% Special case of having priors fixed to particular values.
+if fixed == 6 %medians of the sample for the clinical manuscript
+    priors.muPhi = [-0.1474032;-0.05967633;0];
+    priors.muTheta = -0.04038423; 
+    priors.SigmaPhi = zeros(dim.n_phi,dim.n_phi);%infinite precision (should not need this because it is set earlier in the code but just in case).
+    priors.SigmaTheta = 0; %infinite precision (should not need this because it is set earlier in the code but just in case).
+end
 
 %% set hyper-priors
 % priors.a_sigma = 1;       % Jeffrey's prior
