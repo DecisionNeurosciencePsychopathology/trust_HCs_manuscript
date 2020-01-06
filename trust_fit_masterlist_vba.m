@@ -3,7 +3,7 @@ close all;
 
 %% setting data location + masterlist
 scanner_subjs = 1; %Set to 1 is scanning subjects processed, 0 is behavioral
-clinical = 1; %for clinical datasets
+clinical = 0; %for clinical datasets
 hallquist_override = 0; %If using Hallquist replication dataset
 save_str = date; %default
 
@@ -67,7 +67,7 @@ censor = 0;                     %optional censoring of computer block
 sigma_kappa = 2;                %kappa (or action bias) parameter; kappa = 0: no bias; kappa = 1: single bias parameter; kappa = 2: subject + trustee-specific bias parameters
 counter = 2;                    %counter = 0: no counterfactual feedback; counter = 1: regret; counter = 2: subject/policy; 3: trustee; 4: other type of regret (reviewers); else counter = 5: disappointment (reviewers); counter = 6: SVM model
 multisession = 1;               %0 = modelling all runs as a single block; 1 = modelling runs separately
-fixed = 6;                      % set multisession priors (see description below)
+fixed = 3;                      % set multisession priors (see description below)
 %1: X0 is free; subject-wise kappa only; 
 %2: X0 is fixed; trustee-wise kappa is free; 
 %3: X0 fixed/subject-wise kappa fixed/condition-level kappa is free; 
